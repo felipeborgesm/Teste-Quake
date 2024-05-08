@@ -1,5 +1,6 @@
 import json
 
+
 def parse_quake_log(file_path):
     games_data = []
     current_game = None
@@ -7,7 +8,7 @@ def parse_quake_log(file_path):
 
     with open(file_path, 'r') as file:
         for line in file:
-            # Check if the line is a new game start line (e.g., "InitGame")
+            # Check if the line is a new game
             if "InitGame" in line:
                 if current_game:
                     # Finish current game
@@ -22,13 +23,13 @@ def parse_quake_log(file_path):
                     }
                 }
 
-            # Parse kill event lines
+            # kill event lines
             if "Kill:" in line:
                 parts = line.split()
                 killer_id = int(parts[2])
                 victim_id = int(parts[3])
                 # Extract the killer and victim names
-                killer_name = parts[6] if killer_id != 1022 else "<world>"
+                killer_name = parts[6] if killer_id != 1022 and parts[6] != "killed" else "<world>"
                 victim_name = parts[7]
 
                 # Update the total kills count
@@ -57,7 +58,7 @@ def parse_quake_log(file_path):
         if current_game:
             games_data.append(current_game)
 
-    # Transform the data into the desired output format
+    # Transform into the desired output format
     parsed_data = []
     for game in games_data:
         game_dict = {
@@ -77,7 +78,6 @@ def parse_quake_log(file_path):
     return parsed_data
 
 
-# Sample usage
 file_path = "../Quake.txt"
 parsed_data = parse_quake_log(file_path)
 print(json.dumps(parsed_data, indent=4))
